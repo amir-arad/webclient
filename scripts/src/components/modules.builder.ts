@@ -19,6 +19,7 @@ import * as descriptor from "./modules.descriptor";
 
 import * as typesDescriptor from "./types.descriptor";
 import * as typesBuilder from "./types.builder";
+import {isSingleSourceAsRemoteDescriptor} from "./modules.descriptor";
 function breakDescriptorWithPath(moduleDescriptor: descriptor.Descriptor) {
 	let result: descriptor.Descriptor,
 		path: string[] = moduleDescriptor.name.split(".");
@@ -64,6 +65,21 @@ export function create(moduleDescriptor: net.Url | descriptor.Descriptor, parent
 	}
 
 	loader.then(aDescriptor => {
+		if (isSingleSourceAsRemoteDescriptor(aDescriptor.remote)) {
+			if (moduleDescriptor instanceof net.Url) {
+				aDescriptor.remote = {
+					origin : moduleDescriptor.toString()
+				}
+			} else {
+				if (parent) {
+					aDescriptor.remote = {
+						origin: (<any> parent).loader.getUrl()
+					};
+				} else {
+					aDescriptor.remote = moduleDescriptor.remote;
+				}
+			}
+		}
 		const tree = breakDescriptorWithPath(aDescriptor);
 
 		if (!parent) {

@@ -65,11 +65,19 @@ export interface SingleSourceRemoteDescriptor extends BaseSourceRemoteDescriptor
 	origin: string;
 }
 
+export interface SingleSourceAsRemoteDescriptor extends BaseSourceRemoteDescriptor {
+	originAsDescriptor: true;
+}
+
 export interface MultiSourceRemoteDescriptor extends BaseSourceRemoteDescriptor {
 	origins: { [name: string]: string };
 }
 
-export type SourceRemoteDescriptor = SingleSourceRemoteDescriptor | MultiSourceRemoteDescriptor;
+export type SourceRemoteDescriptor = SingleSourceAsRemoteDescriptor | SingleSourceRemoteDescriptor | MultiSourceRemoteDescriptor;
+
+export function isSingleSourceAsRemoteDescriptor(remote: object): remote is SingleSourceAsRemoteDescriptor {
+	return (remote as SingleSourceAsRemoteDescriptor).originAsDescriptor === true;
+}
 
 export function isSingleSourceRemoteDescriptor(remote: SourceRemoteDescriptor): remote is SingleSourceRemoteDescriptor {
 	return (remote as SingleSourceRemoteDescriptor).origin != null;
